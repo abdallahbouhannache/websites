@@ -1,0 +1,61 @@
+html{
+margin: 0;
+padding: 0;
+}
+
+
+body{
+margin: 0;
+padding: 0;
+}
+
+
+
+
+#canvas{
+    position: relative;
+    top:2em;
+    left:30%;
+    margin: auto;
+    padding: 0;
+    z-index: -5;
+    border: 1px solid blue;
+
+}
+
+#bird{
+    z-index: 15;
+    margin: 0;
+    padding: 0;
+    border:1px solid red;
+}
+
+
+#btn{
+    display: none;
+    padding: 0;
+    margin: 0;
+    z-index:2;
+    position:absolute;
+    top:50%;
+    left:45%;
+    width: auto;
+    height: 40px;
+    background-color: #ded895;
+    border-radius: 8px;
+    border-color: #1b1414d7;
+    border-width: 3px;
+    color:rgb(255, 79, 66);
+    font-size: 18px;
+    font-weight: bold;
+
+}
+
+
+
+
+
+
+
+
+
