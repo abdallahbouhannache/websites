@@ -18,8 +18,8 @@ var speedX = 3, speedY = 2;
 var start = 0;
 var h = Math.floor((Math.random() * 500)), h1 = Math.floor((Math.random() * 500)), h2 = Math.floor((Math.random() * 500));
 var time = new Date().getTime();
-var timeC = 250;
-var pattern = null;
+var timeC = 250,timeD=0;
+var flipUp = false,isFalling=false,timeToFall=new Date().getTime(),degree=0,degUp=40;
 var dif = 0, dif1 = 0, dif2 = 0;
 var frame = null,frame1=null,alive=1;
 var t1 = true; t2 = true; t3 = true;
@@ -34,12 +34,12 @@ var bestScore = window.localStorage.getItem('bestScore')|| 0 ;
 
 
 window.onload = () => {
-    pipedown.src = "./pipedown.png";
-    pipeup.src = "./pipeup.png";
-    bird.src = "./favicon.ico";
-    bird1.src = "./BRD1up.png";
-    bird2.src = "./BRD1down.png";
-    bricks.src = "./brick.png";
+    pipedown.src = "./ress/img/pipedown.png";
+    pipeup.src = "./ress/img/pipeup.png";
+    bird.src = "./ress/img/favicon.ico";
+    bird1.src = "./ress/img/BRD1up.png";
+    bird2.src = "./ress/img/BRD1down.png";
+    bricks.src = "./ress/img/brick.png";
 /* pipe.src = "https://mdn.mozillademos.org/files/1456/Canvas_sun.png"; */
 ctx.beginPath();
 ctx.font = "35px Comic Sans MS";
@@ -55,7 +55,7 @@ function initiating() {
   
        
     drawScene();
-
+        
     
           this.brickPosX -= 7;        
           this.brickPosX1 -= 7;        
@@ -88,24 +88,36 @@ if (new Date().getTime() > this.time + 400  && this.y+10 <height ) {
     
 
         }   
-    if (new Date().getTime() > this.timeC + 390 ) {
-        this.timeC = new Date().getTime();
-        this.velocity+=2;
-      }   
-       
-     
-      if (this.test) {
-        this.y -=this.speedY;  
-      } 
-    if (this.y<=this.oldY-80) {
-        this.test = 0;
-        this.speedY = 2 ;
+   
+    if (this.test) {
+        this.y -= this.speedY;
+        flipUp = true;
+        this.timeD = new Date().getTime();
+    } else {
+        if (new Date().getTime() > this.timeD + 300  ) {
+        
+        this.flipUp = false;              
     }
+    }
+    
+    if (this.y<=this.oldY-80 ) {
+        this.test = 0;
+        this.speedY = 2;        
+    } 
 
         
-           ctx.clearRect(0, 0, width, height);              
+    if (new Date().getTime() > this.timeC + 390  ) {
+        this.timeC = new Date().getTime();
+        this.velocity += 2;      
+    }   
+        
 
-         
+  /*   if (new Date().getTime() > this.timeD + 550  ) {
+        this.timeD = new Date().getTime();
+        this.flipUp = false;              
+    } */
+           ctx.clearRect(0, 0, width, height);                
+        
     //drawing pipes First
            ctx.fillStyle = "green";
            ctx.drawImage(pipedown, this.recPosX, this.recPosY1,100,350);  
@@ -119,13 +131,40 @@ if (new Date().getTime() > this.time + 400  && this.y+10 <height ) {
            //drawing the road
            ctx.drawImage(bricks,this.brickPosX,520,width,100);   
            ctx.drawImage(bricks,this.brickPosX1,520,width,100);   
-    ctx.fillStyle = "white";
+           ctx.fillStyle = "white";
     
 
-   
+    //handling the process of moving upward and downard
+    if (!flipUp) {
+        if (!this.isFalling) {
+        ctx.drawImage(bird, this.x, this.y, 60, 60);        
+        } else {
+             //falling Down
+            this.degree += 1;
+            ctx.save();        
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.degree * Math.PI / 180);
+            ctx.drawImage(bird, 0, 0, 60, 60);
+            ctx.restore();           
+        }        
+
+        
+    } else {
+            //jumping UP
+        ctx.save(); 
+        ctx.translate(this.x-18, this.y+25);
+        ctx.rotate(-degUp * Math.PI / 180); 
+        ctx.translate(0, 0);         
+        ctx.drawImage(bird, 0, 0, 60, 60);     
+        ctx.restore();  
+    }
+
+        
+     
+    
+           
         
 
-           ctx.drawImage(bird, this.x, this.y, 60, 60);     
        
           
     
@@ -141,17 +180,21 @@ document.addEventListener('keydown', (e) => {
         frame = window.requestAnimationFrame(main);
         this.start = 1;
         this.newGame = 0;
-        console.log('new game')
+         this.isFalling = true;
+         console.log('new game');
     }
 
  
-    if (alive ) {     
+    if (alive) {  
+        this.degree = 0;
+        
+        
         this.test = 1;
         this.oldY = this.y;
-        if (e.repeat) { 
+           if (e.repeat) { 
         this.speedY = 9;           
-        } else {
-            
+           } else {
+             
         this.speedY += 6;
             }
         this.velocity = 0;    
@@ -168,12 +211,15 @@ document.addEventListener('click', (e) => {
         frame = window.requestAnimationFrame(main);
         this.start = 1;
         this.newGame = 0;
+         this.isFalling = true;
         console.log('new game')
     }
 
      
     if ( alive ) {     
+        this.degree = 0;  
         
+
         this.test = 1;
         this.oldY = this.y;
         this.speedY += 6;
@@ -187,7 +233,10 @@ document.addEventListener('click', (e) => {
 //making new game
 btn.addEventListener('click', () => {
     setTimeout(() => { 
-    this.newGame = 1;
+        this.newGame = 1;
+        this.isFalling = false;
+        this.degree = 0;
+
     alive = 1;
     this.start=0;
     this.x = 90;
@@ -328,8 +377,15 @@ function scoreCount(params) {
 
  function main() {   
    
+         if (!test) {
+     if (new Date().getTime() > this.timeToFall + 300) {
+         this.timeToFall = new Date().getTime();
+        this.isFalling = true;   
+         }
+         
+    }
     
-    
+     
     
      drawScene();
                      
